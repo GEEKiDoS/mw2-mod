@@ -31,9 +31,6 @@ public:
 		// latched
 		utils::hook::set(0x635974, (uint8_t)0xEB);
 
-		// flag cg_fov as saved
-		utils::hook::set(0x41ED35, (uint8_t)game::DVAR_FLAG_SAVED);
-
 		// Ignore config problems
 		utils::hook::set(0x4D3FD3, (uint8_t)0xEB);
 

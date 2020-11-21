@@ -53,4 +53,78 @@ namespace game
 		int flags;
 	};
 
+	enum DvarSetSource
+	{
+		DVAR_SOURCE_INTERNAL = 0x0,
+		DVAR_SOURCE_EXTERNAL = 0x1,
+		DVAR_SOURCE_SCRIPT = 0x2,
+		DVAR_SOURCE_DEVGUI = 0x3,
+	};
+
+	enum dvar_type
+	{
+		DVAR_TYPE_BOOL = 0x0,
+		DVAR_TYPE_FLOAT = 0x1,
+		DVAR_TYPE_FLOAT_2 = 0x2,
+		DVAR_TYPE_FLOAT_3 = 0x3,
+		DVAR_TYPE_FLOAT_4 = 0x4,
+		DVAR_TYPE_INT = 0x5,
+		DVAR_TYPE_ENUM = 0x6,
+		DVAR_TYPE_STRING = 0x7,
+		DVAR_TYPE_COLOR = 0x8,
+		DVAR_TYPE_FLOAT_3_COLOR = 0x9,
+		DVAR_TYPE_COUNT = 0xA,
+	};
+
+	union DvarValue
+	{
+		bool enabled;
+		int integer;
+		unsigned int unsignedInt;
+		float value;
+		float vector[4];
+		const char* string;
+		char color[4];
+	};
+
+	struct $BFBB53559BEAC4289F32B924847E59CB
+	{
+		int stringCount;
+		const char** strings;
+	};
+
+	struct $9CA192F9DB66A3CB7E01DE78A0DEA53D
+	{
+		int min;
+		int max;
+	};
+
+	struct $251C2428A496074035CACA7AAF3D55BD
+	{
+		float min;
+		float max;
+	};
+
+	union DvarLimits
+	{
+		$BFBB53559BEAC4289F32B924847E59CB enumeration;
+		$9CA192F9DB66A3CB7E01DE78A0DEA53D integer;
+		$251C2428A496074035CACA7AAF3D55BD value;
+		$251C2428A496074035CACA7AAF3D55BD vector;
+	};
+
+	struct dvar_t
+	{
+		const char* name;
+		const char* description;
+		unsigned int flags;
+		char type;
+		bool modified;
+		DvarValue current;
+		DvarValue latched;
+		DvarValue reset;
+		DvarLimits domain;
+		bool(__cdecl* domainFunc)(dvar_t*, DvarValue);
+		dvar_t* hashNext;
+	};
 }

@@ -68,6 +68,7 @@
 
 #include <udis86.h>
 
+#pragma comment(lib, "d3d9.lib")
 #pragma comment(lib, "gdiplus.lib")
 #pragma comment(lib, "ws2_32.lib")
 #pragma comment(lib, "dbghelp.lib")
