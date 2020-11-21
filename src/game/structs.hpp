@@ -34,4 +34,23 @@ namespace game
 		DVAR_FLAG_DEDISAVED = 0x1000000,		//unknown
 		DVAR_FLAG_NONEXISTENT = 0xFFFFFFFF	//no such dvar
 	};
+
+	struct CmdArgs
+	{
+		int nesting;
+		int localClientNum[8];
+		int argc[8];
+		const char** argv[8];
+	};
+
+	struct cmd_function
+	{
+		cmd_function* next;
+		const char* name;
+		const char* autoCompleteDir;
+		const char* autoCompleteExt;
+		void(__cdecl* function)();
+		int flags;
+	};
+
 }

@@ -61,13 +61,13 @@ BEGIN
     BEGIN
         BLOCK "040904b0"
         BEGIN
-            VALUE "CompanyName", "momo5502"
-            VALUE "FileDescription", "Open-IW5"
+            VALUE "CompanyName", "GEEKiDoS"
+            VALUE "FileDescription", "Modern Warfare 2 Singleplayer Mod"
             VALUE "FileVersion", "1.0.0.0"
-            VALUE "InternalName", "Open-IW5"
+            VALUE "InternalName", "MW2-MOD"
             VALUE "LegalCopyright", "All rights reserved."
-            VALUE "OriginalFilename", "open-iw5.exe"
-            VALUE "ProductName", "open-iw5"
+            VALUE "OriginalFilename", "mw2-mod.exe"
+            VALUE "ProductName", "MW2-MOD"
             VALUE "ProductVersion", "1.0.0.0"
         END
     END
