@@ -3,7 +3,7 @@
 class d3d9ex final : public component
 {
 public:
-	void post_load();
+	void post_load() override;
 
 private:
 

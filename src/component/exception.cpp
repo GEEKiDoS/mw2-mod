@@ -165,14 +165,11 @@ namespace
 		return EXCEPTION_CONTINUE_SEARCH;
 	}
 
-	LPTOP_LEVEL_EXCEPTION_FILTER WINAPI set_unhandled_exception_filter_stub(LPTOP_LEVEL_EXCEPTION_FILTER)
-	{
-		// Don't register anything here...
-		return &exception_filter;
-	}
+	utils::detour *raise_exception_detour = nullptr;
 
 	VOID WINAPI raise_exception_stub(DWORD dwExceptionCode, DWORD dwExceptionFlags, DWORD nNumberOfArguments, CONST ULONG_PTR* lpArguments)
 	{
+		// I don't know why game try to throw this even the debugger was not present
 		if (dwExceptionCode == 0x406d1388)
 		{
 			typedef struct tagTHREADNAME_INFO
@@ -185,8 +182,13 @@ namespace
 
 			THREADNAME_INFO* info = (THREADNAME_INFO*)lpArguments;
 
-			printf("Thread %d, name = %s\n", info->dwThreadID, info->szName);
+			printf("Got thread name: thread %d, name = %s\n", info->dwThreadID, info->szName);
+
+			if (!IsDebuggerPresent())
+				return;
 		}
+
+		raise_exception_detour->get(RaiseException)(dwExceptionCode, dwExceptionFlags, nNumberOfArguments, lpArguments);
 	}
 }
 
@@ -195,11 +197,15 @@ class exception final : public component
 public:
 	void post_load() override
 	{
-		SetUnhandledExceptionFilter(exception_filter);
+		utils::hook(0x687BB5, exception_filter, HOOK_JUMP).install()->quick();
 
-		utils::hook::hook(SetUnhandledExceptionFilter, set_unhandled_exception_filter_stub, HOOK_JUMP).install()->quick();
-		utils::hook::hook(RaiseException, raise_exception_stub, HOOK_JUMP).install()->quick();
-	}
+		raise_exception_detour = new utils::detour(RaiseException, raise_exception_stub);
+	};
+
+	void pre_destroy() override
+	{
+		delete raise_exception_detour;
+	};
 };
 
 REGISTER_COMPONENT(exception)

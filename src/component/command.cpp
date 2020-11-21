@@ -20,15 +20,6 @@ void command::add(const std::string& name, const std::function<void(const std::v
 	game::Cmd_AddCommand(cmd_name, dispatcher, cmd_function, false);
 }
 
-void command::pre_destroy()
-{
-	std::lock_guard _(mutex_);
-	if (!callbacks_.empty())
-	{
-		callbacks_.clear();
-	}
-}
-
 void command::dispatcher()
 {
 	const auto cmd_index = game::cmd_args->nesting;
@@ -49,6 +40,23 @@ void command::dispatcher()
 	}
 
 	handler->second(arguments);
+}
+
+void command::pre_destroy()
+{
+	std::lock_guard _(mutex_);
+	if (!callbacks_.empty())
+	{
+		callbacks_.clear();
+	}
+}
+
+void command::post_load()
+{
+	command::add("crash_test", [](const std::vector<std::string>& args)
+	{
+		*(int*)0x0 = 1;
+	});
 }
 
 REGISTER_COMPONENT(command);

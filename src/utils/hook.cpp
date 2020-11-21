@@ -1,8 +1,88 @@
 #include <std_include.hpp>
 #include "hook.hpp"
+#include "string.hpp"
+#include "MinHook.h"
 
 namespace utils
 {
+	namespace
+	{
+		class _
+		{
+		public:
+			_()
+			{
+				if (MH_Initialize() != MH_OK)
+				{
+					throw std::runtime_error("Failed to initialize MinHook");
+				}
+			}
+
+			~_()
+			{
+				MH_Uninitialize();
+			}
+		} __;
+	}
+
+	detour::detour(const size_t place, void* target) : detour(reinterpret_cast<void*>(place), target)
+	{
+	}
+
+	detour::detour(void* place, void* target)
+	{
+		this->create(place, target);
+	}
+
+	detour::~detour()
+	{
+		this->clear();
+	}
+
+	void detour::enable() const
+	{
+		MH_EnableHook(this->place_);
+	}
+
+	void detour::disable() const
+	{
+		MH_DisableHook(this->place_);
+	}
+
+	void detour::create(void* place, void* target)
+	{
+		this->clear();
+		this->place_ = place;
+
+		if (MH_CreateHook(this->place_, target, &this->original_) != MH_OK)
+		{
+			throw std::runtime_error(string::va("Unable to create hook at location: %p", this->place_));
+		}
+
+		this->enable();
+	}
+
+	void detour::create(const size_t place, void* target)
+	{
+		this->create(reinterpret_cast<void*>(place), target);
+	}
+
+	void detour::clear()
+	{
+		if (this->place_)
+		{
+			MH_RemoveHook(this->place_);
+		}
+
+		this->place_ = nullptr;
+		this->original_ = nullptr;
+	}
+
+	void* detour::get_original() const
+	{
+		return this->original_;
+	}
+
 	void hook::signature::process()
 	{
 		if (this->signatures_.empty()) return;

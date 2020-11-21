@@ -40,7 +40,7 @@ public:
 		game::dvar_t* dvar;
 	};
 
-	void post_load();
+	void post_load() override;
 
 	// Only strings and bools use this type of declaration
 	template<typename T> static var register_var(const char* name, T value, flag flag, const char* description);
