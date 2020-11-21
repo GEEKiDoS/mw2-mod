@@ -1,5 +1,5 @@
 #include <std_include.hpp>
-#include "module/dw.hpp"
+#include "component/dw.hpp"
 #include "utils/cryptography.hpp"
 
 namespace demonware

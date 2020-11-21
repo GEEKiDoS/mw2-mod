@@ -1,8 +1,8 @@
 #pragma once
-#include "loader/module_loader.hpp"
+#include "loader/component_loader.hpp"
 #include "utils/concurrent_list.hpp"
 
-class scheduler final : public module
+class scheduler final : public component
 {
 public:
 	static void on_frame(const std::function<void()>& callback);

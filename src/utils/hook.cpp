@@ -113,11 +113,11 @@ namespace utils
 		}
 	}
 
-	bool hook::iat(const nt::module module, const std::string& target_module, const std::string& process, void* stub)
+	bool hook::iat(const nt::library library, const std::string& target_library, const std::string& process, void* stub)
 	{
-		if (!module.is_valid()) return false;
+		if (!library.is_valid()) return false;
 
-		auto ptr = module.get_iat_entry(target_module, process);
+		auto ptr = library.get_iat_entry(target_library, process);
 		if (!ptr) return false;
 
 		DWORD protect;

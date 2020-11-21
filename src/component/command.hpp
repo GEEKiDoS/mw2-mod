@@ -1,8 +1,8 @@
 #pragma once
-#include "loader/module_loader.hpp"
+#include "loader/component_loader.hpp"
 #include "utils/memory.hpp"
 
-class command final : public module
+class command final : public component
 {
 public:
 	static void add(const std::string& name, const std::function<void(const std::vector<std::string>&)>& callback);

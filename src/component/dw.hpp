@@ -1,5 +1,5 @@
 #pragma once
-#include "loader/module_loader.hpp"
+#include "loader/component_loader.hpp"
 #include "game/demonware/stun_server.hpp"
 #include "game/demonware/service_server.hpp"
 
@@ -8,7 +8,7 @@
 
 namespace demonware
 {
-	class dw final : public module
+	class dw final : public component
 	{
 	public:
 		dw();

@@ -1,14 +1,14 @@
 #include <std_include.hpp>
-#include "loader/module_loader.hpp"
+#include "loader/component_loader.hpp"
 #include "utils/nt.hpp"
 #include "utils/string.hpp"
 
-class game_launcher final : public module
+class game_launcher final : public component
 {
 public:
-	void* load_import(const std::string& module, const std::string& function) override
+	void* load_import(const std::string& library, const std::string& function) override
 	{
-		if (utils::string::to_lower(module) == "shell32.dll" && function == "ShellExecuteA")
+		if (utils::string::to_lower(library) == "shell32.dll" && function == "ShellExecuteA")
 		{
 			return shell_execute_a;
 		}
@@ -36,7 +36,7 @@ private:
 
 	static void launch_game(const bool singleplayer)
 	{
-		const utils::nt::module self;
+		const utils::nt::library self;
 
 		STARTUPINFOA s_info;
 		PROCESS_INFORMATION p_info;
@@ -56,4 +56,4 @@ private:
 	}
 };
 
-REGISTER_MODULE(game_launcher)
+REGISTER_COMPONENT(game_launcher)

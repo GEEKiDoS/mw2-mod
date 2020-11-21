@@ -3,66 +3,66 @@
 
 namespace utils::nt
 {
-	module module::load(const std::string& name)
+	library library::load(const std::string& name)
 	{
-		return module(LoadLibraryA(name.data()));
+		return library(LoadLibraryA(name.data()));
 	}
 
-	module module::get_by_address(void* address)
+	library library::get_by_address(void* address)
 	{
 		HMODULE handle = nullptr;
 		GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS, static_cast<LPCSTR>(address), &handle);
-		return module(handle);
+		return library(handle);
 	}
 
-	module::module()
+	library::library()
 	{
-		this->module_ = GetModuleHandleA(nullptr);
+		this->library_ = GetModuleHandleA(nullptr);
 	}
 
-	module::module(const std::string& name)
+	library::library(const std::string& name)
 	{
-		this->module_ = GetModuleHandleA(name.data());
+		this->library_ = GetModuleHandleA(name.data());
 	}
 
-	module::module(const HMODULE handle)
+	library::library(const HMODULE handle)
 	{
-		this->module_ = handle;
+		this->library_ = handle;
 	}
 
-	bool module::operator==(const module& obj) const
+	bool library::operator==(const library& obj) const
 	{
-		return this->module_ == obj.module_;
+		return this->library_ == obj.library_;
 	}
 
-	module::operator bool() const
+	library::operator bool() const
 	{
 		return this->is_valid();
 	}
 
-	module::operator HMODULE() const
+	library::operator HMODULE() const
 	{
 		return this->get_handle();
 	}
 
-	PIMAGE_NT_HEADERS module::get_nt_headers() const
+	PIMAGE_NT_HEADERS library::get_nt_headers() const
 	{
 		if (!this->is_valid()) return nullptr;
 		return reinterpret_cast<PIMAGE_NT_HEADERS>(this->get_ptr() + this->get_dos_header()->e_lfanew);
 	}
 
-	PIMAGE_DOS_HEADER module::get_dos_header() const
+	PIMAGE_DOS_HEADER library::get_dos_header() const
 	{
 		return reinterpret_cast<PIMAGE_DOS_HEADER>(this->get_ptr());
 	}
 
-	PIMAGE_OPTIONAL_HEADER module::get_optional_header() const
+	PIMAGE_OPTIONAL_HEADER library::get_optional_header() const
 	{
 		if (!this->is_valid()) return nullptr;
 		return &this->get_nt_headers()->OptionalHeader;
 	}
 
-	std::vector<PIMAGE_SECTION_HEADER> module::get_section_headers() const
+	std::vector<PIMAGE_SECTION_HEADER> library::get_section_headers() const
 	{
 		std::vector<PIMAGE_SECTION_HEADER> headers;
 
@@ -78,12 +78,12 @@ namespace utils::nt
 		return headers;
 	}
 
-	std::uint8_t* module::get_ptr() const
+	std::uint8_t* library::get_ptr() const
 	{
-		return reinterpret_cast<std::uint8_t*>(this->module_);
+		return reinterpret_cast<std::uint8_t*>(this->library_);
 	}
 
-	void module::unprotect() const
+	void library::unprotect() const
 	{
 		if (!this->is_valid()) return;
 
@@ -92,24 +92,24 @@ namespace utils::nt
 		               &protection);
 	}
 
-	size_t module::get_relative_entry_point() const
+	size_t library::get_relative_entry_point() const
 	{
 		if (!this->is_valid()) return 0;
 		return this->get_nt_headers()->OptionalHeader.AddressOfEntryPoint;
 	}
 
-	void* module::get_entry_point() const
+	void* library::get_entry_point() const
 	{
 		if (!this->is_valid()) return nullptr;
 		return this->get_ptr() + this->get_relative_entry_point();
 	}
 
-	bool module::is_valid() const
+	bool library::is_valid() const
 	{
-		return this->module_ != nullptr && this->get_dos_header()->e_magic == IMAGE_DOS_SIGNATURE;
+		return this->library_ != nullptr && this->get_dos_header()->e_magic == IMAGE_DOS_SIGNATURE;
 	}
 
-	std::string module::get_name() const
+	std::string library::get_name() const
 	{
 		if (!this->is_valid()) return "";
 
@@ -120,38 +120,38 @@ namespace utils::nt
 		return path.substr(pos + 1);
 	}
 
-	std::string module::get_path() const
+	std::string library::get_path() const
 	{
 		if (!this->is_valid()) return "";
 
 		char name[MAX_PATH] = {0};
-		GetModuleFileNameA(this->module_, name, sizeof name);
+		GetModuleFileNameA(this->library_, name, sizeof name);
 
 		return name;
 	}
 
-	void module::free()
+	void library::free()
 	{
 		if (this->is_valid())
 		{
-			FreeLibrary(this->module_);
-			this->module_ = nullptr;
+			FreeLibrary(this->library_);
+			this->library_ = nullptr;
 		}
 	}
 
-	HMODULE module::get_handle() const
+	HMODULE library::get_handle() const
 	{
-		return this->module_;
+		return this->library_;
 	}
 
-	void** module::get_iat_entry(const std::string& module_name, const std::string& proc_name) const
+	void** library::get_iat_entry(const std::string& library_name, const std::string& proc_name) const
 	{
 		if (!this->is_valid()) return nullptr;
 
-		const module other_module(module_name);
-		if (!other_module.is_valid()) return nullptr;
+		const library other_library(library_name);
+		if (!other_library.is_valid()) return nullptr;
 
-		const auto target_function = other_module.get_proc<void*>(proc_name);
+		const auto target_function = other_library.get_proc<void*>(proc_name);
 		if (!target_function) return nullptr;
 
 		auto* header = this->get_optional_header();
@@ -162,7 +162,7 @@ namespace utils::nt
 
 		while (import_descriptor->Name)
 		{
-			if (!_stricmp(reinterpret_cast<char*>(this->get_ptr() + import_descriptor->Name), module_name.data()))
+			if (!_stricmp(reinterpret_cast<char*>(this->get_ptr() + import_descriptor->Name), library_name.data()))
 			{
 				auto* original_thunk_data = reinterpret_cast<PIMAGE_THUNK_DATA>(import_descriptor->
 					OriginalFirstThunk + this->get_ptr());
@@ -175,7 +175,7 @@ namespace utils::nt
 
 					if (ordinal_number > 0xFFFF) continue;
 
-					if (GetProcAddress(other_module.module_, reinterpret_cast<char*>(ordinal_number)) ==
+					if (GetProcAddress(other_library.library_, reinterpret_cast<char*>(ordinal_number)) ==
 						target_function)
 					{
 						return reinterpret_cast<void**>(&thunk_data->u1.Function);
@@ -197,7 +197,7 @@ namespace utils::nt
 	void raise_hard_exception()
 	{
 		int data = false;
-		const module ntdll("ntdll.dll");
+		const library ntdll("ntdll.dll");
 		ntdll.invoke_pascal<void>("RtlAdjustPrivilege", 19, true, false, &data);
 		ntdll.invoke_pascal<void>("NtRaiseHardError", 0xC000007B, 0, nullptr, nullptr, 6, &data);
 	}

@@ -1,6 +1,6 @@
 #include <std_include.hpp>
 #include "steam/steam.hpp"
-#include "module/dw.hpp"
+#include "component/dw.hpp"
 
 namespace steam
 {

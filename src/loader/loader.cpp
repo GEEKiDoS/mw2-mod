@@ -7,25 +7,25 @@ loader::loader(const launcher::mode mode) : mode_(mode)
 {
 }
 
-FARPROC loader::load(const utils::nt::module& module) const
+FARPROC loader::load(const utils::nt::library& library) const
 {
 	const auto buffer = binary_loader::load(this->mode_);
 	if (buffer.empty()) return nullptr;
 
-	const utils::nt::module source(HMODULE(buffer.data()));
+	const utils::nt::library source(HMODULE(buffer.data()));
 	if (!source) return nullptr;
 
-	this->load_sections(module, source);
-	this->load_imports(module, source);
+	this->load_sections(library, source);
+	this->load_imports(library, source);
 
 	if (source.get_optional_header()->DataDirectory[IMAGE_DIRECTORY_ENTRY_TLS].Size)
 	{
-		const auto target_tls = reinterpret_cast<PIMAGE_TLS_DIRECTORY>(module.get_ptr() + module
+		const auto target_tls = reinterpret_cast<PIMAGE_TLS_DIRECTORY>(library.get_ptr() + library
 		                                                                                  .get_optional_header()
 		                                                                                  ->
 		                                                                                  DataDirectory
 			[IMAGE_DIRECTORY_ENTRY_TLS].VirtualAddress);
-		const auto source_tls = reinterpret_cast<PIMAGE_TLS_DIRECTORY>(module.get_ptr() + source
+		const auto source_tls = reinterpret_cast<PIMAGE_TLS_DIRECTORY>(library.get_ptr() + source
 		                                                                                  .get_optional_header()
 		                                                                                  ->
 		                                                                                  DataDirectory
@@ -52,16 +52,16 @@ FARPROC loader::load(const utils::nt::module& module) const
 	}
 
 	DWORD oldProtect;
-	VirtualProtect(module.get_nt_headers(), 0x1000, PAGE_EXECUTE_READWRITE, &oldProtect);
+	VirtualProtect(library.get_nt_headers(), 0x1000, PAGE_EXECUTE_READWRITE, &oldProtect);
 
-	module.get_optional_header()->DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT] = source
+	library.get_optional_header()->DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT] = source
 	                                                                            .get_optional_header()->DataDirectory[
 		IMAGE_DIRECTORY_ENTRY_IMPORT];
-	std::memmove(module.get_nt_headers(), source.get_nt_headers(),
+	std::memmove(library.get_nt_headers(), source.get_nt_headers(),
 	             sizeof(IMAGE_NT_HEADERS) + source.get_nt_headers()->FileHeader.NumberOfSections * sizeof(
 		             IMAGE_SECTION_HEADER));
 
-	return FARPROC(module.get_ptr() + source.get_relative_entry_point());
+	return FARPROC(library.get_ptr() + source.get_relative_entry_point());
 }
 
 void loader::set_import_resolver(const std::function<FARPROC(const std::string&, const std::string&)>& resolver)
@@ -69,7 +69,7 @@ void loader::set_import_resolver(const std::function<FARPROC(const std::string&,
 	this->import_resolver_ = resolver;
 }
 
-void loader::load_section(const utils::nt::module& target, const utils::nt::module& source,
+void loader::load_section(const utils::nt::library& target, const utils::nt::library& source,
                           IMAGE_SECTION_HEADER* section)
 {
 	void* target_ptr = target.get_ptr() + section->VirtualAddress;
@@ -90,7 +90,7 @@ void loader::load_section(const utils::nt::module& target, const utils::nt::modu
 	}
 }
 
-void loader::load_sections(const utils::nt::module& target, const utils::nt::module& source) const
+void loader::load_sections(const utils::nt::library& target, const utils::nt::library& source) const
 {
 	for (auto& section : source.get_section_headers())
 	{
@@ -98,7 +98,7 @@ void loader::load_sections(const utils::nt::module& target, const utils::nt::mod
 	}
 }
 
-void loader::load_imports(const utils::nt::module& target, const utils::nt::module& source) const
+void loader::load_imports(const utils::nt::library& target, const utils::nt::library& source) const
 {
 	const auto import_directory = &source.get_optional_header()->DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT];
 
@@ -124,10 +124,10 @@ void loader::load_imports(const utils::nt::module& target, const utils::nt::modu
 			// is this an ordinal-only import?
 			if (IMAGE_SNAP_BY_ORDINAL(*name_table_entry))
 			{
-				auto module = utils::nt::module::load(name);
-				if (module)
+				auto library = utils::nt::library::load(name);
+				if (library)
 				{
-					function = GetProcAddress(module, MAKEINTRESOURCEA(IMAGE_ORDINAL(*name_table_entry)));
+					function = GetProcAddress(library, MAKEINTRESOURCEA(IMAGE_ORDINAL(*name_table_entry)));
 				}
 
 				function_name = "#" + std::to_string(IMAGE_ORDINAL(*name_table_entry));
@@ -140,17 +140,17 @@ void loader::load_imports(const utils::nt::module& target, const utils::nt::modu
 				if (this->import_resolver_) function = this->import_resolver_(name, function_name);
 				if (!function)
 				{
-					auto module = utils::nt::module::load(name);
-					if (module)
+					auto library = utils::nt::library::load(name);
+					if (library)
 					{
-						function = GetProcAddress(module, function_name.data());
+						function = GetProcAddress(library, function_name.data());
 					}
 				}
 			}
 
 			if (!function)
 			{
-				throw std::runtime_error(utils::string::va("Unable to load import '%s' from module '%s'",
+				throw std::runtime_error(utils::string::va("Unable to load import '%s' from library '%s'",
 				                                           function_name.data(), name.data()));
 			}
 

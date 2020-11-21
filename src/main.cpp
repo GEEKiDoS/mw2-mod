@@ -1,7 +1,7 @@
 #include <std_include.hpp>
 #include "launcher/launcher.hpp"
 #include "loader/loader.hpp"
-#include "loader/module_loader.hpp"
+#include "loader/component_loader.hpp"
 #include "game/game.hpp"
 #include "utils/string.hpp"
 #include "utils/flags.hpp"
@@ -14,13 +14,13 @@
 
 DECLSPEC_NORETURN void WINAPI exit_hook(const int code)
 {
-	module_loader::pre_destroy();
+	component_loader::pre_destroy();
 	exit(code);
 }
 
 void verify_tls()
 {
-	const utils::nt::module self;
+	const utils::nt::library self;
 	const auto self_tls = reinterpret_cast<PIMAGE_TLS_DIRECTORY>(self.get_ptr()
 		+ self.get_optional_header()->DataDirectory[IMAGE_DIRECTORY_ENTRY_TLS].VirtualAddress);
 
@@ -59,11 +59,11 @@ launcher::mode detect_mode_from_arguments()
 FARPROC load_binary(const launcher::mode mode)
 {
 	loader loader(mode);
-	utils::nt::module self;
+	utils::nt::library self;
 
-	loader.set_import_resolver([self](const std::string& module, const std::string& function) -> FARPROC
+	loader.set_import_resolver([self](const std::string& library, const std::string& function) -> FARPROC
 	{
-		if (module == "steam_api.dll")
+		if (library == "steam_api.dll")
 		{
 			return self.get_proc<FARPROC>(function);
 		}
@@ -72,7 +72,7 @@ FARPROC load_binary(const launcher::mode mode)
 			return FARPROC(exit_hook);
 		}
 
-		return FARPROC(module_loader::load_import(module, function));
+		return FARPROC(component_loader::load_import(library, function));
 	});
 
 	return loader.load(self);
@@ -89,7 +89,7 @@ int main()
 		{
 			if (premature_shutdown)
 			{
-				module_loader::pre_destroy();
+				component_loader::pre_destroy();
 			}
 		});
 
@@ -101,7 +101,7 @@ int main()
 #endif
 
 			verify_tls();
-			if (!module_loader::post_start()) return 0;
+			if (!component_loader::post_start()) return 0;
 
 			auto mode = detect_mode_from_arguments();
 			if (mode == launcher::mode::none)
@@ -118,7 +118,7 @@ int main()
 			}
 
 			game::initialize(mode);
-			if (!module_loader::post_load()) return 0;
+			if (!component_loader::post_load()) return 0;
 
 			premature_shutdown = false;
 		}

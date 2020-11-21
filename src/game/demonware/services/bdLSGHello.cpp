@@ -1,6 +1,6 @@
 #include <std_include.hpp>
 #include "bdLSGHello.hpp"
-#include "module/dw.hpp"
+#include "component/dw.hpp"
 
 namespace demonware
 {

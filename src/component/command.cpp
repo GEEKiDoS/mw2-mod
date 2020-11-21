@@ -51,4 +51,4 @@ void command::dispatcher()
 	handler->second(arguments);
 }
 
-REGISTER_MODULE(command);
+REGISTER_COMPONENT(command);

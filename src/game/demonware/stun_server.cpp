@@ -1,6 +1,6 @@
 #include <std_include.hpp>
 #include <utility>
-#include "module/dw.hpp"
+#include "component/dw.hpp"
 #include "utils/cryptography.hpp"
 #include "byte_buffer.hpp"
 

@@ -2,22 +2,22 @@
 
 namespace utils::nt
 {
-	class module final
+	class library final
 	{
 	public:
-		static module load(const std::string& name);
-		static module get_by_address(void* address);
+		static library load(const std::string& name);
+		static library get_by_address(void* address);
 
-		module();
-		explicit module(const std::string& name);
-		explicit module(HMODULE handle);
+		library();
+		explicit library(const std::string& name);
+		explicit library(HMODULE handle);
 
-		module(const module& a) : module_(a.module_)
+		library(const library& a) : library_(a.library_)
 		{
 		}
 
-		bool operator!=(const module& obj) const { return !(*this == obj); };
-		bool operator==(const module& obj) const;
+		bool operator!=(const library& obj) const { return !(*this == obj); };
+		bool operator==(const library& obj) const;
 
 		operator bool() const;
 		operator HMODULE() const;
@@ -38,7 +38,7 @@ namespace utils::nt
 		T get_proc(const std::string& process) const
 		{
 			if (!this->is_valid()) T{};
-			return reinterpret_cast<T>(GetProcAddress(this->module_, process.data()));
+			return reinterpret_cast<T>(GetProcAddress(this->library_, process.data()));
 		}
 
 		template <typename T>
@@ -78,10 +78,10 @@ namespace utils::nt
 		PIMAGE_DOS_HEADER get_dos_header() const;
 		PIMAGE_OPTIONAL_HEADER get_optional_header() const;
 
-		void** get_iat_entry(const std::string& module_name, const std::string& proc_name) const;
+		void** get_iat_entry(const std::string& library_name, const std::string& proc_name) const;
 
 	private:
-		HMODULE module_;
+		HMODULE library_;
 	};
 
 	void raise_hard_exception();
