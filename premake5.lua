@@ -36,8 +36,8 @@ newoption {
 
 dependencies.load()
 
-workspace "open-iw5"
-	startproject "open-iw5"
+workspace "mw2-mod"
+	startproject "mw2-mod"
 	location "./build"
 	objdir "%{wks.location}/obj"
 	targetdir "%{wks.location}/bin/%{cfg.platform}/%{cfg.buildcfg}"
@@ -93,7 +93,7 @@ workspace "open-iw5"
 
 	configuration {}
 
-	project "open-iw5"
+	project "mw2-mod"
 		kind "ConsoleApp"
 		language "C++"
 

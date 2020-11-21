@@ -46,7 +46,7 @@ void launcher::create_main_menu()
 		});
 
 	this->main_window_.create("Open-IW5", 750, 430);
-	this->main_window_.load_html(load_content(MENU_MAIN));
+	// this->main_window_.load_html(load_content(MENU_MAIN));
 	this->main_window_.show();
 }
 

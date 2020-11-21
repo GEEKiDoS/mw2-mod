@@ -20,8 +20,15 @@ public:
 
 	void post_start() override
 	{
-		scheduler::on_frame(std::bind(&console::log_messages, this));
-		this->console_runner_ = std::thread(std::bind(&console::runner, this));
+		scheduler::on_frame([this]()
+		{
+			this->log_messages();
+		});
+
+		this->console_runner_ = std::thread([this]
+		{
+			this->runner();
+		});
 	}
 
 	void pre_destroy() override
@@ -42,10 +49,7 @@ public:
 
 	void post_load() override
 	{
-		if (!game::is_dedi())
-		{
-			game::native::Sys_ShowConsole();
-		}
+		game::Sys_ShowConsole();
 
 		std::lock_guard _(this->mutex_);
 		this->console_initialized_ = true;
@@ -87,7 +91,7 @@ private:
 	static void log_message(const std::string& message)
 	{
 		OutputDebugStringA(message.data());
-		game::native::Conbuf_AppendText(message.data());
+		game::Conbuf_AppendText(message.data());
 	}
 
 	void runner()

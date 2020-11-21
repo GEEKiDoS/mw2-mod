@@ -1,6 +1,5 @@
 #include <std_include.hpp>
 #include "steam/steam.hpp"
-#include "component/dw.hpp"
 
 namespace steam
 {
@@ -112,7 +111,7 @@ namespace steam
 		// Generate the authentication ticket
 		const auto id = this->GetSteamID();
 
-		auth_ticket = "Open-IW5";
+		auth_ticket = "MW2-MOD";
 		auth_ticket.resize(32);
 		auth_ticket.append(reinterpret_cast<char*>(pUserData), cbUserData);
 		auth_ticket.append(reinterpret_cast<const char*>(&id.bits), sizeof(id.bits));

@@ -30,7 +30,7 @@ void scheduler::error(const std::string& message, int level)
 void scheduler::frame_stub()
 {
 	execute();
-	reinterpret_cast<void(*)()>(SELECT_VALUE(0x458600, 0x556470, 0x4DB070))();
+	reinterpret_cast<void(*)()>(0x4D3FC0)();
 }
 
 __declspec(naked) void scheduler::execute()
@@ -60,11 +60,11 @@ void scheduler::execute_safe()
 void scheduler::execute_error()
 {
 	const char* message = nullptr;
-	int level = 0;
+	game::errorParm level = game::ERR_FATAL;
 
-	if (get_next_error(&message, &level) && message)
+	if (get_next_error(&message, (int *)&level) && message)
 	{
-		game::native::Com_Error(level, "%s", message);
+		game::Com_Error(level, "%s", message);
 	}
 }
 
@@ -88,7 +88,7 @@ bool scheduler::get_next_error(const char** error_message, int* error_level)
 
 void scheduler::post_load()
 {
-	utils::hook(SELECT_VALUE(0x44C7DB, 0x55688E, 0x4DB324), frame_stub, HOOK_CALL).install()->quick();
+	utils::hook(0x49C3AF, frame_stub, HOOK_CALL).install()->quick();
 }
 
 void scheduler::pre_destroy()

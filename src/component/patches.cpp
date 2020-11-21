@@ -8,53 +8,56 @@ class patches final : public component
 public:
 	void post_load() override
 	{
-		if (!game::is_dedi()) this->patch_clients();
+		// prevent stat loading from steam
+		utils::hook::set(0x43FB33, (uint8_t)0xC3);
 
-		if (game::is_sp()) this->patch_sp();
-		else if (game::is_mp()) this->patch_mp();
-		else if (game::is_dedi()) this->patch_dedi();
+		// remove limit on IWD file loading
+		utils::hook::set(0x630FF3, (uint8_t)0xEB);
 
-		utils::hook(game::native::_longjmp, long_jump_stub, HOOK_JUMP).install()->quick();
-	}
+		// remove fs_game check for moddable rawfiles 
+		// allows non-fs_game to modify rawfiles
+		utils::hook::nop(0x612932, 2);
 
-private:
-	void patch_clients() const
-	{
-		// Remove improper quit check
-		utils::hook::nop(SELECT_VALUE(0x53444A, 0x5CCDC0, 0), 9);
+		// prevent matchmaking stuff
+		utils::hook::set(0x43BAE0, (uint8_t)0xEB);
 
-		// Ignore sdm files
-		utils::hook::nop(SELECT_VALUE(0x4438BA, 0x6371EA, 0), 2);
-	}
+		// remove dvar restrictions
+		// read only
+		utils::hook::set(0x635841, (uint8_t)0xEB);
+		// cheat protected
+		utils::hook::set(0x635913, (uint8_t)0xEB);
+		// write protected
+		utils::hook::set(0x6358A5, (uint8_t)0xEB);
+		// latched
+		utils::hook::set(0x635974, (uint8_t)0xEB);
 
-	void patch_sp() const
-	{
-		// SP doesn't initialize WSA
-		WSADATA wsa_data;
-		WSAStartup(MAKEWORD(2, 2), &wsa_data);
+		// flag cg_fov as saved
+		utils::hook::set(0x41ED35, (uint8_t)game::DVAR_FLAG_SAVED);
 
-		// Disable remote storage
-		utils::hook::set<BYTE>(0x663B5A, 0xEB);
-		utils::hook::set<BYTE>(0x663C54, 0xEB);
-	}
+		// Ignore config problems
+		utils::hook::set(0x4D3FD3, (uint8_t)0xEB);
 
-	void patch_mp() const
-	{
-	}
+		// force debug logging
+		utils::hook::nop(0x456BE5, 2);
 
-	void patch_dedi() const
-	{
-	}
+		// No improper quit popup
+		utils::hook::nop(0x4F5B3A, 2);
 
-	static __declspec(noreturn) void long_jump_stub(jmp_buf buf, const int value) noexcept(false)
-	{
-#ifdef DEBUG
-		{
-			printf("Unwinding the stack...\n");
-		}
-#endif
+		// spdata
+		utils::hook::set<const char*>(0x631561, "spdata");
 
-		longjmp(buf, value);
+		// R_MAX_SKINNED_CACHE_VERTICES
+		utils::hook::set(0x52046C, 0x480000 * 4);
+		utils::hook::set(0x520489, 0x480000 * 4);
+		utils::hook::set(0x52049C, 0x480000 * 4);
+		utils::hook::set(0x520506, 0x480000 * 4);
+		utils::hook::set(0x549245, 0x480000 * 4);
+		utils::hook::set(0x549356, 0x480000 * 4);
+
+		// PMem_Init, g_mem size
+		utils::hook::set(0x4318ED, 0x140000 * 4);
+		utils::hook::set(0x43190E, 0x140000 * 4);
+		utils::hook::set(0x431922, 0x140000 * 4);
 	}
 };
 

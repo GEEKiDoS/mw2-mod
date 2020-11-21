@@ -17,7 +17,7 @@ public:
 
 	void post_load() override
 	{
-		if (game::is_dedi()) return;
+		if (game::enviroment::is_dedi()) return;
 
 		this->load_client();
 
@@ -25,14 +25,7 @@ public:
 
 		try
 		{
-			if (game::is_sp())
-			{
-				this->start_mod("\xF0\x9F\x90\x8D Open-IW5 Singleplayer", 42680);
-			}
-			else if (game::is_mp())
-			{
-				this->start_mod("\xF0\x9F\x90\x8D Open-IW5 Multiplayer", 42690);
-			}
+			this->start_mod("\xF0\x9F\x91\xA3 MW2 Mod", 10180);
 		}
 		catch (std::exception& e)
 		{
@@ -142,7 +135,7 @@ private:
 		game_id.raw.type = 1; // k_EGameIDTypeGameMod
 		game_id.raw.app_id = app_id & 0xFFFFFF;
 
-		const auto mod_id = "OIW5";
+		const auto mod_id = "IW4MOD";
 		game_id.raw.mod_id = *reinterpret_cast<const unsigned int*>(mod_id) | 0x80000000;
 
 		this->client_user_.invoke<bool>("SpawnProcess", self.get_path().data(), cmdline.data(), our_directory,
