@@ -33,8 +33,8 @@ public:
 		void set(float value);
 
 		// TODO: Add others
-		void setRaw(int integer);
-		void setRaw(float value);
+		void set_raw(int integer);
+		void set_raw(float value);
 
 	private:
 		game::dvar_t* dvar;

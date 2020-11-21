@@ -123,7 +123,7 @@ void dvar::var::set(float value)
 	}
 }
 
-void dvar::var::setRaw(int integer)
+void dvar::var::set_raw(int integer)
 {
 	if (this->dvar)
 	{
@@ -131,7 +131,7 @@ void dvar::var::setRaw(int integer)
 	}
 }
 
-void dvar::var::setRaw(float value)
+void dvar::var::set_raw(float value)
 {
 	if (this->dvar)
 	{
