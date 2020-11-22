@@ -34,14 +34,8 @@ public:
 		// Ignore config problems
 		utils::hook::set(0x4D3FD3, (uint8_t)0xEB);
 
-		// force debug logging
-		utils::hook::nop(0x456BE5, 2);
-
 		// No improper quit popup
 		utils::hook::nop(0x4F5B3A, 2);
-
-		// spdata
-		utils::hook::set<const char*>(0x631561, "spdata");
 
 		// R_MAX_SKINNED_CACHE_VERTICES
 		utils::hook::set(0x52046C, 0x480000 * 4);

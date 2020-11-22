@@ -49,6 +49,9 @@ namespace game
 
 	WEAK Symbol<void(const char* cmdName, void(*function), cmd_function* allocedCmd, bool isKey)> Cmd_AddCommand{ 0x4478A0 };
 
+	WEAK Symbol<const char* (const char* name)> DB_GetFastfilePath{ 0x4429F0 };
+	WEAK Symbol<void(XZoneInfo* data, int count, int sync)> DB_LoadXAssets{ 0x4CFC90 };
+
 	WEAK Symbol<dvar_t* (const char* dvar)> Dvar_FindVar{ 0x4B29D0 };
 	WEAK Symbol<dvar_t* (const char* name, const char* value)> Dvar_SetCommand{ 0x4959D0 };
 	WEAK Symbol<dvar_t* (const char* name, bool default_val, int flags, const char* description)> Dvar_RegisterBool{ 0x429390 };
@@ -60,6 +63,12 @@ namespace game
 
 	WEAK Symbol<void(void* field) > Field_Clear{ 0x45C350 };
 
+	WEAK Symbol<void(int bLanguageCull)>FS_DisplayPath{ 0x41AC20 };
+	WEAK Symbol<void(const char* path, const char* pszGameFolder)> FS_AddIwdFilesForGameDirectory{ 0x630DB0 };
+
+	WEAK Symbol<void* (size_t size)> Z_Malloc{ 0X4BF110 };
+
 	// variables
 	WEAK Symbol<CmdArgs> cmd_args{ 0x144FEF0 };
+	WEAK Symbol<searchpath_s**> fs_searchpaths{ 0x195AA50 };
 }

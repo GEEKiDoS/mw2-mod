@@ -127,4 +127,123 @@ namespace game
 		bool(__cdecl* domainFunc)(dvar_t*, DvarValue);
 		dvar_t* hashNext;
 	};
+
+	struct directory_t
+	{
+		char path[256];
+		char gamedir[256];
+	};
+
+	struct searchpath_s
+	{
+		searchpath_s* next;
+		void* iwd; // actually iwd_t*, but I dont care
+		directory_t* dir;
+		int bLocalized;
+		int ignore;
+		int ignorePureCheck;
+		int language;
+	};
+
+	struct XSurfaceVertexInfo
+	{
+		__int16 vertCount[4];
+		unsigned __int16* vertsBlend;
+	};
+
+	union GfxColor
+	{
+		unsigned int packed;
+		char array[4];
+	};
+
+	union PackedTexCoords
+	{
+		unsigned int packed;
+	};
+
+	union PackedUnitVec
+	{
+		unsigned int packed;
+		char array[4];
+	};
+
+	struct GfxPackedVertex
+	{
+		float xyz[3];
+		float binormalSign;
+		GfxColor color;
+		PackedTexCoords texCoord;
+		PackedUnitVec normal;
+		PackedUnitVec tangent;
+	};
+
+	struct XSurfaceCollisionAabb
+	{
+		unsigned __int16 mins[3];
+		unsigned __int16 maxs[3];
+	};
+
+	struct XSurfaceCollisionNode
+	{
+		XSurfaceCollisionAabb aabb;
+		unsigned __int16 childBeginIndex;
+		unsigned __int16 childCount;
+	};
+
+	struct XSurfaceCollisionLeaf
+	{
+		unsigned __int16 triangleBeginIndex;
+	};
+
+	struct XSurfaceCollisionTree
+	{
+		float trans[3];
+		float scale[3];
+		unsigned int nodeCount;
+		XSurfaceCollisionNode* nodes;
+		unsigned int leafCount;
+		XSurfaceCollisionLeaf* leafs;
+	};
+
+	struct XRigidVertList
+	{
+		unsigned __int16 boneOffset;
+		unsigned __int16 vertCount;
+		unsigned __int16 triOffset;
+		unsigned __int16 triCount;
+		XSurfaceCollisionTree* collisionTree;
+	};
+
+	struct XSurface
+	{
+		char tileMode;
+		bool deformed;
+		unsigned __int16 vertCount;
+		unsigned __int16 triCount;
+		char zoneHandle;
+		unsigned __int16 baseTriIndex;
+		unsigned __int16 baseVertIndex;
+		unsigned __int16* triIndices;
+		XSurfaceVertexInfo vertInfo;
+		GfxPackedVertex* verts0;
+		unsigned int vertListCount;
+		XRigidVertList* vertList;
+		int partBits[6];
+	};
+
+	struct XModelSurfs
+	{
+		const char* name;
+		XSurface* surfs;
+		unsigned __int16 numsurfs;
+		int partBits[6];
+	};
+
+	struct XZoneInfo
+	{
+		const char* name;
+		int allocFlags;
+		int freeFlags;
+	};
 }
