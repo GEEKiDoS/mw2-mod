@@ -40,6 +40,10 @@ namespace game
 		T* sp_object_;
 	};
 
+	// rewritted functions
+	Glyph* R_GetCharacterGlyph(Font_s* font, unsigned int letter);
+	int R_LetterWidth(unsigned int letter, Font_s* font);
+
 	// functions
 	WEAK Symbol<void(errorParm code, const char* message, ...)> Com_Error{ 0x43DD90 };
 
@@ -64,9 +68,14 @@ namespace game
 	WEAK Symbol<void(void* field) > Field_Clear{ 0x45C350 };
 
 	WEAK Symbol<void(int bLanguageCull)>FS_DisplayPath{ 0x41AC20 };
+	WEAK Symbol<const char**(const char* path, const char* extension, FsListBehavior_e behavior, int* numfiles)>FS_ListFiles{ 0x4448F0 };
 	WEAK Symbol<void(const char* path, const char* pszGameFolder)> FS_AddIwdFilesForGameDirectory{ 0x630DB0 };
 
-	WEAK Symbol<void* (size_t size)> Z_Malloc{ 0X4BF110 };
+	WEAK Symbol<char*(const char* psFileName, bool forceEnglish)> SE_Load{ 0x409910 };
+	WEAK Symbol<char*(bool forceEnglish)> SE_LoadLanguage{ 0x4F6F40 };
+	WEAK Symbol<int(unsigned int firstChar, unsigned int secondChar, int* usedCount, int* pbIsTrailingPunctuation)> SEH_DecodeLetter{ 0x461B80 };
+
+	WEAK Symbol<void*(size_t size)> Z_Malloc{ 0x4BF110 };
 
 	// variables
 	WEAK Symbol<CmdArgs> cmd_args{ 0x144FEF0 };

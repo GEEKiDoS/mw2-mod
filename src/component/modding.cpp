@@ -12,7 +12,7 @@ namespace
 	void add_search_path(const char* path, const char *basepath)
 	{
 		auto search = reinterpret_cast<game::searchpath_s *>(game::Z_Malloc(sizeof(game::searchpath_s)));
-		auto dir = reinterpret_cast<game::directory_t*>(game::Z_Malloc(sizeof(game::directory_t)));
+		auto dir = reinterpret_cast<game::directory_t *>(game::Z_Malloc(sizeof(game::directory_t)));
 
 		strcpy_s(dir->gamedir, path);
 		strcpy_s(dir->path, basepath);
@@ -33,7 +33,7 @@ namespace
 	{
 		dvar::var fs_basepath("fs_basepath");
 
-		auto custom_path = "custom";
+		const auto custom_path = "custom";
 
 		if (std::filesystem::exists(custom_path))
 		{

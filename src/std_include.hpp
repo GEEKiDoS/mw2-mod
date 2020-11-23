@@ -38,6 +38,7 @@
 #include <DbgHelp.h>
 #include <TlHelp32.h>
 #include <winnt.h>
+#include <d3d9.h>
 
 // min and max is required by gdi, therefore NOMINMAX won't work
 #ifdef max

@@ -1,5 +1,4 @@
 #include "std_include.hpp"
-#include <d3d9.h>
 
 #include "component/dvar.hpp"
 #include "loader/component_loader.hpp"
