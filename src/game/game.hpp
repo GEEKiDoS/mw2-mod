@@ -68,14 +68,23 @@ namespace game
 	WEAK Symbol<void(void* field) > Field_Clear{ 0x45C350 };
 
 	WEAK Symbol<void(int bLanguageCull)>FS_DisplayPath{ 0x41AC20 };
-	WEAK Symbol<const char**(const char* path, const char* extension, FsListBehavior_e behavior, int* numfiles)>FS_ListFiles{ 0x4448F0 };
+	WEAK Symbol<int(const char* qpath, void** buffer)> FS_ReadFile{ 0x4A5480 };
+	WEAK Symbol<int(const char* filename, int* file)> FS_FOpenFileRead{ 0x48DD10 };
+	WEAK Symbol<int(int h)> FS_FCloseFile{ 0x44E0A0 };
+	WEAK Symbol<int(void* buffer, int len, int h)> FS_Read{ 0x42EDC0 };
+	WEAK Symbol<const char** (const char* path, const char* extension, FsListBehavior_e behavior, int* numfiles)>FS_ListFiles{ 0x4448F0 };
 	WEAK Symbol<void(const char* path, const char* pszGameFolder)> FS_AddIwdFilesForGameDirectory{ 0x630DB0 };
+	WEAK Symbol<void(const char** list)> FS_FreeFileList{ 0x41C7A0 };
+	WEAK Symbol<void(void* buffer)> FS_FreeFile{ 0x4A7510 };
+	WEAK Symbol<int(const char* filename, const void* buffer, int size)> FS_WriteFile{ 0x422380 };
 
-	WEAK Symbol<char*(const char* psFileName, bool forceEnglish)> SE_Load{ 0x409910 };
-	WEAK Symbol<char*(bool forceEnglish)> SE_LoadLanguage{ 0x4F6F40 };
+	WEAK Symbol<char* (const char* psFileName, bool forceEnglish)> SE_Load{ 0x409910 };
+	WEAK Symbol<char* (bool forceEnglish)> SE_LoadLanguage{ 0x4F6F40 };
 	WEAK Symbol<int(unsigned int firstChar, unsigned int secondChar, int* usedCount, int* pbIsTrailingPunctuation)> SEH_DecodeLetter{ 0x461B80 };
 
-	WEAK Symbol<void*(size_t size)> Z_Malloc{ 0x4BF110 };
+	WEAK Symbol<void __fastcall(void* _this, void* edx, const char* psLocalReference, const char* psNewString, int bSentenceIsEnglish)>CStringEdPackage_SetString {0x4BF570};
+
+	WEAK Symbol<void* (size_t size)> Z_Malloc{ 0x4BF110 };
 
 	// variables
 	WEAK Symbol<CmdArgs> cmd_args{ 0x144FEF0 };
