@@ -89,6 +89,7 @@ namespace game
 	WEAK Symbol<int(unsigned int firstChar, unsigned int secondChar, int* usedCount, int* pbIsTrailingPunctuation)> SEH_DecodeLetter{ 0x461B80 };
 
 	WEAK Symbol<void __fastcall(void* _this, void* edx, const char* psLocalReference, const char* psNewString, int bSentenceIsEnglish)>CStringEdPackage_SetString {0x4BF570};
+	WEAK Symbol<const char* (const char* psLocalReference)>CStringEdPackage_GetString {0x61BB10};
 
 	WEAK Symbol<void()> Disconnect_f{ 0x57D8E0 };
 

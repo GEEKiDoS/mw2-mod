@@ -5,11 +5,18 @@
 #pragma comment(linker, "/merge:.cl=.main")
 #pragma comment(linker, "/merge:.text=.main")
 #pragma comment(linker, "/base:0x400000")
+#pragma comment(linker, "/stack:0x2000000")
 
 #pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='x86' publicKeyToken='6595b64144ccf1df' language='*'\"")
 
 #pragma bss_seg(".payload")
 char payload_data[BINARY_PAYLOAD_SIZE];
+
+extern "C"
+{
+	__declspec(dllexport) DWORD NvOptimusEnablement = 1;
+	__declspec(dllexport) DWORD AmdPowerXpressRequestHighPerformance = 1;
+};
 
 extern "C" {
 int s_read_arc4random(void*, size_t)

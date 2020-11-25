@@ -64,6 +64,8 @@ namespace
 		game::FS_FreeFileList(files);
 	}
 
+	utils::detour *seh_stringed_getstring_detour = nullptr;
+
 	const char* seh_stringed_getstring_hook(const char* pszReference)
 	{
 		dvar::var loc_translate{ "loc_translate" };
@@ -73,9 +75,7 @@ namespace
 			if (overrides.find(pszReference) != overrides.end())
 				return (const char *)overrides[pszReference].data();
 
-			auto *entry = game::DB_FindXAssetHeader(game::ASSET_TYPE_LOCALIZE_ENTRY, pszReference).localize;
-
-			return entry->value;
+			return seh_stringed_getstring_detour->get(seh_stringed_getstring_hook)(pszReference);
 		}
 
 		return pszReference;
@@ -252,7 +252,7 @@ public:
 	void post_load() override
 	{
 		utils::hook(0x61BCA7, se_load_language_stub, HOOK_CALL).install()->quick();
-		utils::hook(0x61BB10, seh_stringed_getstring_hook).install()->quick();
+		seh_stringed_getstring_detour = new utils::detour(0x61BB10, seh_stringed_getstring_hook);
 
 #ifdef USE_UTF8
 		// yay, replace the MBCS with UTF-8!
@@ -261,6 +261,11 @@ public:
 		utils::hook(0x5775E0, printable_chars_count_stub, HOOK_JUMP).install()->quick();
 		utils::hook(0x4B1050, read_char_from_string_1, HOOK_JUMP).install()->quick();
 #endif
+	}
+
+	void pre_destroy() override
+	{
+		delete seh_stringed_getstring_detour;
 	}
 };
 

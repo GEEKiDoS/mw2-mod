@@ -6,8 +6,6 @@
 #include "utils/string.hpp"
 #include "utils/compression.hpp"
 
-#define DEDI_HASH "F271C305117B79242E254E9F64BD5AA2993CAC8E57975243EBD44CD576418D20"
-
 namespace binary_loader
 {
 	std::string load_resource(const int id)

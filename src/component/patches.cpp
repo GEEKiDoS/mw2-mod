@@ -49,13 +49,16 @@ namespace
 			{
 				sv_spawn_server_detour->get(sv_spawn_server_hook)(nextmap.data(), 0, sp_nextmap_savegame);
 			});
+		}
 
-			game::Menus_OpenByName(a1, "pregame");
-		}
-		else
-		{
-			game::Menus_OpenByName(a1, name);
-		}
+		game::Menus_OpenByName(a1, name);
+	}
+
+	void sub_4AE630_hook(const char* file, int line)
+	{
+		printf("out of memory");
+
+		return;
 	}
 }
 
@@ -102,17 +105,20 @@ public:
 		utils::hook::set(0x549356, 0x480000 * 4);
 
 		// PMem_Init, g_mem size
-		utils::hook::set(0x4318ED, 0x140000 * 4);
-		utils::hook::set(0x43190E, 0x140000 * 4);
-		utils::hook::set(0x431922, 0x140000 * 4);
-
+		// 0x14800000 is from Black Ops 1 seems to be large enough
+		utils::hook::set(0x4318ED, 0x14800000);
+		utils::hook::set(0x43190E, 0x14800000);
+		utils::hook::set(0x431922, 0x14800000);
+								   
 		reallocate_asset_pool(game::ASSET_TYPE_RAWFILE, 4096);
+		reallocate_asset_pool(game::ASSET_TYPE_LOADED_SOUND, 4096);
+		reallocate_asset_pool(game::ASSET_TYPE_FX, 2048);
 
 		// fix to crash in sub_5250E0 while changing map from af_caves to af_chase with gfl mod
 		utils::hook(0x4A7F07, menu_open_mainmenu_hook, HOOK_CALL).install()->quick();
 		sv_spawn_server_detour = new utils::detour(0x4348E0, sv_spawn_server_hook);
 
-		//utils::hook(0x5250E0, sub_5250E0_hook).install()->quick();
+		// utils::hook(0x4AE630, sub_4AE630_hook).install()->quick();
 	}
 
 	void pre_destroy() override
