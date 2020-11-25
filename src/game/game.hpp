@@ -54,6 +54,7 @@ namespace game
 	WEAK Symbol<void(const char* cmdName, void(*function), cmd_function* allocedCmd, bool isKey)> Cmd_AddCommand{ 0x4478A0 };
 
 	WEAK Symbol<const char* (const char* name)> DB_GetFastfilePath{ 0x4429F0 };
+	WEAK Symbol <XAssetHeader(XAssetType type, const char* name)> DB_FindXAssetHeader{ 0x40B200 };
 	WEAK Symbol<void(XZoneInfo* data, int count, int sync)> DB_LoadXAssets{ 0x4CFC90 };
 
 	WEAK Symbol<dvar_t* (const char* dvar)> Dvar_FindVar{ 0x4B29D0 };

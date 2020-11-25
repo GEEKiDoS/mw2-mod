@@ -39,7 +39,7 @@ namespace
 		{
 			for (auto& entry : std::filesystem::directory_iterator(custom_path))
 			{
-				if (entry.is_directory())
+				if (entry.is_directory() && entry.path().extension() != ".disabled")
 				{
 					auto search_path = entry.path();
 
