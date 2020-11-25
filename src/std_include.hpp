@@ -7,6 +7,7 @@
 #pragma warning(disable: 4244)
 #pragma warning(disable: 4458)
 #pragma warning(disable: 4702)
+#pragma warning(disable: 5054)
 #pragma warning(disable: 6297)
 #pragma warning(disable: 6385)
 #pragma warning(disable: 6386)
@@ -66,6 +67,8 @@
 #include <tomcrypt.h>
 
 #include <gsl/gsl>
+
+#include <rapidjson/document.h>
 
 #include <udis86.h>
 

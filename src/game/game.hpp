@@ -53,7 +53,10 @@ namespace game
 
 	WEAK Symbol<void(const char* cmdName, void(*function), cmd_function* allocedCmd, bool isKey)> Cmd_AddCommand{ 0x4478A0 };
 
+	WEAK Symbol<void(int localClientNum, const char* text)> Cbuf_AddText{ 0x4A1090 };
+
 	WEAK Symbol<const char* (const char* name)> DB_GetFastfilePath{ 0x4429F0 };
+	WEAK Symbol<int(XAssetType type)> DB_GetXAssetTypeSize{ 0x40F720 };
 	WEAK Symbol <XAssetHeader(XAssetType type, const char* name)> DB_FindXAssetHeader{ 0x40B200 };
 	WEAK Symbol<void(XZoneInfo* data, int count, int sync)> DB_LoadXAssets{ 0x4CFC90 };
 
@@ -79,15 +82,21 @@ namespace game
 	WEAK Symbol<void(void* buffer)> FS_FreeFile{ 0x4A7510 };
 	WEAK Symbol<int(const char* filename, const void* buffer, int size)> FS_WriteFile{ 0x422380 };
 
+	WEAK Symbol<int(int a1, const char* name)> Menus_OpenByName{ 0x4470B0 };
+
 	WEAK Symbol<char* (const char* psFileName, bool forceEnglish)> SE_Load{ 0x409910 };
 	WEAK Symbol<char* (bool forceEnglish)> SE_LoadLanguage{ 0x4F6F40 };
 	WEAK Symbol<int(unsigned int firstChar, unsigned int secondChar, int* usedCount, int* pbIsTrailingPunctuation)> SEH_DecodeLetter{ 0x461B80 };
 
 	WEAK Symbol<void __fastcall(void* _this, void* edx, const char* psLocalReference, const char* psNewString, int bSentenceIsEnglish)>CStringEdPackage_SetString {0x4BF570};
 
+	WEAK Symbol<void()> Disconnect_f{ 0x57D8E0 };
+
 	WEAK Symbol<void* (size_t size)> Z_Malloc{ 0x4BF110 };
 
 	// variables
 	WEAK Symbol<CmdArgs> cmd_args{ 0x144FEF0 };
 	WEAK Symbol<searchpath_s**> fs_searchpaths{ 0x195AA50 };
+	WEAK Symbol<void*[]> DB_XAssetPool{ 0x7337F8 };
+	WEAK Symbol<unsigned int[]> g_poolSize{ 0x733510 };
 }

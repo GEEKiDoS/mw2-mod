@@ -1,6 +1,5 @@
 #include <std_include.hpp>
 #include <map>
-#include "rapidjson/document.h"
 
 #include "component/dvar.hpp"
 #include "component/filesystem.hpp"

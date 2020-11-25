@@ -1,7 +1,63 @@
 #include <std_include.hpp>
+#include "component/dvar.hpp"
+#include "component/scheduler.hpp"
 #include "loader/component_loader.hpp"
 #include "utils/hook.hpp"
 #include "game/game.hpp"
+
+namespace
+{
+	void reallocate_asset_pool(game::XAssetType type, unsigned int size)
+	{
+		int asset_size = game::DB_GetXAssetTypeSize(type);
+		void* pool = malloc(size * asset_size);
+
+		(*game::DB_XAssetPool)[type] = pool;
+		(*game::g_poolSize)[type] = size;
+	}
+
+	utils::detour* sv_spawn_server_detour = nullptr;
+
+	std::string sp_nextmap;
+	int sp_nextmap_savegame;
+
+	void sv_spawn_server_hook(const char* server, int mapIsPreloaded, int savegame)
+	{
+		dvar::var sv_running("sv_running");
+		
+		if (sv_running.get<bool>())
+		{
+			sp_nextmap = server;
+			sp_nextmap_savegame = savegame;
+
+			game::Cbuf_AddText(0, "disconnect\n");
+		}
+		else
+		{
+			sv_spawn_server_detour->get(sv_spawn_server_hook)(server, mapIsPreloaded, savegame);
+		}
+	}
+
+	void menu_open_mainmenu_hook(int a1, const char *name)
+	{
+		if (sp_nextmap != "")
+		{
+			std::string nextmap = sp_nextmap;
+			sp_nextmap = "";
+
+			scheduler::once([nextmap]() 
+			{
+				sv_spawn_server_detour->get(sv_spawn_server_hook)(nextmap.data(), 0, sp_nextmap_savegame);
+			});
+
+			game::Menus_OpenByName(a1, "pregame");
+		}
+		else
+		{
+			game::Menus_OpenByName(a1, name);
+		}
+	}
+}
 
 class patches final : public component
 {
@@ -49,6 +105,19 @@ public:
 		utils::hook::set(0x4318ED, 0x140000 * 4);
 		utils::hook::set(0x43190E, 0x140000 * 4);
 		utils::hook::set(0x431922, 0x140000 * 4);
+
+		reallocate_asset_pool(game::ASSET_TYPE_RAWFILE, 4096);
+
+		// fix to crash in sub_5250E0 while changing map from af_caves to af_chase with gfl mod
+		utils::hook(0x4A7F07, menu_open_mainmenu_hook, HOOK_CALL).install()->quick();
+		sv_spawn_server_detour = new utils::detour(0x4348E0, sv_spawn_server_hook);
+
+		//utils::hook(0x5250E0, sub_5250E0_hook).install()->quick();
+	}
+
+	void pre_destroy() override
+	{
+		delete sv_spawn_server_detour;
 	}
 };
 
