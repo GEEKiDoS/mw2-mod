@@ -103,6 +103,7 @@ namespace
 		return error;
 	}
 
+#ifdef USE_UTF8
 	int u8_read_char(const char* utf8Stream, int* numBytesConsumed)
 	{
 		int u8char = 0;
@@ -158,8 +159,6 @@ namespace
 	int printable_chars_count_u8(game::MessageWindow* msgwnd, game::MessageLine* line)
 	{
 		int printedCnt = 0;
-
-		char psText[5];
 		int idx = 0;
 
 		if (line->textBufSize > 0)
@@ -169,13 +168,8 @@ namespace
 				int pos = msgwnd->textBufPos + idx;
 				int len = line->textBufSize - 1;
 
-				psText[0] = msgwnd->circularTextBuffer[len & pos];
-				psText[1] = msgwnd->circularTextBuffer[len & (pos + 1)];
-				psText[2] = msgwnd->circularTextBuffer[len & (pos + 2)];
-				psText[3] = msgwnd->circularTextBuffer[len & (pos + 3)];
-
 				int usedCharCnt = 0;
-				auto ch = u8_read_char(psText, &usedCharCnt);
+				auto ch = u8_read_char(msgwnd->circularTextBuffer + (len & pos), &usedCharCnt);
 
 				idx += usedCharCnt;
 				++printedCnt;
@@ -183,7 +177,6 @@ namespace
 				if (ch == '^')
 				{
 					char color_code = msgwnd->circularTextBuffer[(msgwnd->textBufSize - 1) & idx + line->textBufPos];
-					psText[0] = color_code;
 
 					if (color_code != '^' && color_code - '0' <= 11)
 						++idx;
@@ -251,11 +244,7 @@ namespace
 	{
 		return seh_read_char_from_string_utf8(&text, nullptr);
 	}
-
-	void test()
-	{
-		printf("wtf");
-	}
+#endif
 }
 
 class localized_string final : public component
@@ -267,11 +256,13 @@ public:
 
 		seh_stringed_getstring_detour = new utils::detour(0x61BB10, seh_stringed_getstring_hook);
 
+#ifdef USE_UTF8
 		// yay, replace the MBCS with UTF-8!
 		utils::hook(0x416100, seh_read_char_from_string_utf8, HOOK_JUMP).install()->quick();
 		utils::hook(0x508BB0, r_console_text_width_hook, HOOK_JUMP).install()->quick();
 		utils::hook(0x5775E0, printable_chars_count_stub, HOOK_JUMP).install()->quick();
 		utils::hook(0x4B1050, read_char_from_string_1, HOOK_JUMP).install()->quick();
+#endif
 	}
 
 	void pre_destroy() override
