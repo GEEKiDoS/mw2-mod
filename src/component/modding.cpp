@@ -139,6 +139,9 @@ public:
 		utils::hook::set(0x4256B9, (uint8_t)0xEB);
 
 		utils::hook(0x45EE95, load_xsurface_array_fix, HOOK_CALL).install()->quick();
+
+		// Ignore image version mismatch
+		utils::hook(0x544748, 0x544761, HOOK_JUMP).install()->quick();
 	}
 };
 
