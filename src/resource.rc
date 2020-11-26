@@ -84,8 +84,7 @@ END
 
 102       ICON   "resources/icon.ico"
 
-BINARY_SP RCDATA "resources/iw4sp.exe"
-
+BINARY_SP_ZSTD RCDATA "resources/iw4sp.exe.zst"
 
 #endif    // English (United States) resources
 /////////////////////////////////////////////////////////////////////////////

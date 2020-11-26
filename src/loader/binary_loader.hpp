@@ -3,6 +3,5 @@
 
 namespace binary_loader
 {
-	void create();
 	std::string load(launcher::mode mode);
 }

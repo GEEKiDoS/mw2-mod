@@ -21,6 +21,6 @@ namespace binary_loader
 
 	std::string load(const launcher::mode mode)
 	{
-		return load_resource(BINARY_SP);
+		return utils::compression::zstd::decompress(load_resource(BINARY_SP_ZSTD));
 	}
 }

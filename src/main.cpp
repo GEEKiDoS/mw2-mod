@@ -1,6 +1,7 @@
 #include <std_include.hpp>
 #include "launcher/launcher.hpp"
 #include "loader/loader.hpp"
+#include "loader/binary_loader.hpp"
 #include "loader/component_loader.hpp"
 #include "game/game.hpp"
 #include "utils/string.hpp"
